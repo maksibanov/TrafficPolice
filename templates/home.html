@@ -377,7 +377,6 @@
     </style>
 </head>
 <body>
-    <!-- Модальное окно для добавления кандидата -->
     <div id="addCandidateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -531,9 +530,7 @@
                     let value = '-';
 
                     if (raw !== null && raw !== undefined) {
-                        // Специальная обработка для статуса экзамена
                         if (col === 'status_exam') {
-                            // Поддерживаем булевы и строковые представления
                             if (raw === true) {
                                 value = 'Сдал';
                             } else {
@@ -620,12 +617,10 @@
                 });
         }
 
-        // Переменные для хранения исходных данных
         let candidatesData = [];
         let statementsData = [];
         let examsData = [];
 
-        // Сохраняем исходные данные при загрузке
         const originalLoadCandidates = loadCandidates;
         loadCandidates = function() {
             const section = document.getElementById('candidates-section');
@@ -699,7 +694,7 @@
                 });
         };
 
-        // Функции фильтрации таблиц
+        // функции фильтрации таблиц
         function filterCandidatesTable() {
             const searchValue = document.getElementById('candidates-search').value.toLowerCase().trim();
             
@@ -753,7 +748,7 @@
             renderTable(filtered, 'exams-table');
         }
 
-        // Управление модальным окном добавления кандидата
+        // управление окном добавления кандидата
         function openAddModal() {
             const modal = document.getElementById('addCandidateModal');
             modal.classList.add('show');
@@ -774,14 +769,14 @@
             const documents = document.getElementById('documents').value.trim();
             const dateStr = document.getElementById('date').value.trim();
 
-            // Простая валидация
+            // валидация
             if (!fio || !documents || !dateStr) {
                 document.getElementById('modal-message').textContent = 'Ошибка: заполните все поля';
                 document.getElementById('modal-message').style.color = '#cc0000';
                 return;
             }
 
-            // Отправляем данные на сервер
+            // отправка данных на сервер
             fetch('/api/add-candidate', {
                 method: 'POST',
                 headers: {
@@ -802,14 +797,11 @@
                 return response.json();
             })
             .then(data => {
-                // Успешно добавлено
                 document.getElementById('modal-message').textContent = 'Кандидат успешно добавлен!';
                 document.getElementById('modal-message').style.color = '#00aa00';
                 
-                // Закрываем модальное окно через 1 секунду
                 setTimeout(() => {
                     closeAddModal();
-                    // Перезагружаем таблицу кандидатов
                     loadCandidates();
                 }, 1000);
             })
@@ -820,7 +812,7 @@
             });
         }
 
-        // Закрытие модала по клику на темный фон
+        // закрытие окна при нажатии сбоку
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('addCandidateModal');
             if (event.target === modal) {
@@ -828,7 +820,7 @@
             }
         });
 
-        // Добавляем поддержку Enter в поисковых полях
+        // поддержка клавиши Enter
         document.addEventListener('DOMContentLoaded', function() {
             const candidatesSearch = document.getElementById('candidates-search');
             const statementsSearch = document.getElementById('statements-search');
