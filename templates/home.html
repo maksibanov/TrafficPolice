@@ -776,6 +776,13 @@
                 return;
             }
 
+            // проверка длины паспорта 
+            if (!/^\d{10}$/.test(documents)) {
+                document.getElementById('modal-message').textContent = 'Ошибка: серия и номер паспорта должны содержать ровно 10 цифр';
+                document.getElementById('modal-message').style.color = '#cc0000';
+                return;
+            }
+
             // отправка данных на сервер
             fetch('/api/add-candidate', {
                 method: 'POST',

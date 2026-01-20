@@ -189,6 +189,9 @@ def add_candidate():
         if not fcs or not documents or not date_birth:
             return {"error": "Все поля обязательны"}, 400
 
+        if not documents.isdigit() or len(documents) != 10:
+            return {"error": "Номер паспорта должен содержать ровно 10 цифр"}, 400
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
