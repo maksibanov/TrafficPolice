@@ -160,30 +160,28 @@ footer:hover {
     transform: translateY(-2px);
 }
 
-/* --- СТИЛИ ДЛЯ ФОРМ ВХОДА --- */
 
-/* Центрирование формы */
+/* центрирование */
 .form-container {
     max-width: 450px;
     margin: 0 auto;
-    /* По центру экрана */
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    /* Отступ между полями */
+    /* отступ */
 }
 
-/* Обертка для каждого поля */
+/* обертка поля */
 .form-group {
     display: flex;
     flex-direction: column;
     text-align: left;
 }
 
-/* Подписи (Логин/Пароль) */
+/* логин и пароль */
 .form-group label {
     color: #0052cc;
     margin-bottom: 8px;
@@ -192,7 +190,7 @@ footer:hover {
     text-transform: uppercase;
 }
 
-/* Сами поля ввода */
+/* поля ввода */
 .form-group input {
     padding: 12px;
     background-color: #ffffff;
@@ -204,14 +202,14 @@ footer:hover {
     transition: 0.3s;
 }
 
-/* Эффект при клике на поле */
+/* эффект при нажатии */
 .form-group input:focus {
     outline: none;
     border-color: #cc0000;
     box-shadow: 0 0 8px rgba(204, 0, 0, 0.3);
 }
 
-/* Кнопка "Войти" */
+/* кнопка входа */
 .submit-btn {
     margin-top: 10px;
     padding: 15px;
