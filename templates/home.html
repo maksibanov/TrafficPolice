@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГИБДД</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .action-btn {
+            padding: 20px 15px;
+            background: linear-gradient(135deg, #0052cc 0%, #003366 100%);
+            color: white;
+            border: 2px solid #cc0000;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            text-align: center;
+            width: 100%;
+        }
+        .action-btn:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #ff6b6b 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(204, 0, 0, 0.3);
+        }
+        .nested-buttons {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 4px solid #0052cc;
+            border-radius: 4px;
+        }
+        .nested-buttons.show {
+            display: block;
+            animation: slideDown 0.3s ease-in-out;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .nested-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #0052cc 0%, #003366 100%);
+            color: white;
+            border: 2px solid #cc0000;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .nested-btn:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #ff6b6b 100%);
+            box-shadow: 0 4px 8px rgba(204, 0, 0, 0.3);
+        }
+        .data-section {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-left: 4px solid #0052cc;
+            border-radius: 4px;
+        }
+        .data-section.show {
+            display: block;
+            animation: slideDown 0.3s ease-in-out;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0, 82, 204, 0.1);
+        }
+        .data-table thead {
+            background: linear-gradient(90deg, #0052cc 0%, #003366 100%);
+            color: white;
+        }
+        .data-table thead th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 3px solid #cc0000;
+        }
+        .data-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: 0.2s;
+        }
+        .data-table tbody tr:hover {
+            background-color: rgba(0, 82, 204, 0.05);
+        }
+        .data-table tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .data-table tbody td {
+            padding: 12px 15px;
+            color: #003366;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #0052cc;
+            font-weight: bold;
+        }
+        .error {
+            background: #ffebee;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #cc0000;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .user-info {
+            background: linear-gradient(135deg, rgba(0, 82, 204, 0.1) 0%, rgba(255, 255, 255, 0.8) 100%);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0052cc;
+            border-top: 2px solid #cc0000;
+        }
+        .logout-btn {
+            background: #cc0000;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background: #ff6b6b;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 2px solid #0052cc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #003366;
+        }
+        .search-input::placeholder {
+            color: #999;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 8px rgba(204, 0, 0, 0.3);
+        }
+        .search-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #0052cc 0%, #003366 100%);
+            color: white;
+            border: 2px solid #cc0000;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .search-btn:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #ff6b6b 100%);
+            box-shadow: 0 4px 8px rgba(204, 0, 0, 0.3);
+        }
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 82, 204, 0.3);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease-in-out;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0052cc;
+            padding-bottom: 15px;
+        }
+        .modal-header h2 {
+            color: #0052cc;
+            margin: 0;
+            font-size: 24px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #cc0000;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-close:hover {
+            color: #ff6b6b;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #0052cc;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #0052cc;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #003366;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 8px rgba(204, 0, 0, 0.3);
+        }
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            padding: 5px;
+            background: #f5f5f5;
+            border-left: 3px solid #0052cc;
+            padding-left: 10px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .modal-btn.submit {
+            background: linear-gradient(135deg, #0052cc 0%, #003366 100%);
+            color: white;
+            border: 2px solid #cc0000;
+            flex: 1;
+        }
+        .modal-btn.submit:hover {
+            background: linear-gradient(135deg, #cc0000 0%, #ff6b6b 100%);
+            box-shadow: 0 4px 8px rgba(204, 0, 0, 0.3);
+        }
+        .modal-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #ccc;
+        }
+        .modal-btn.cancel:hover {
+            background: #e0e0e0;
+        }
+        .success-message {
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2e7d32;
+        }
+        .error-message {
+            background: #ffcdd2;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #c62828;
+        }
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            .data-table {
+                font-size: 14px;
+            }
+            .data-table tbody td, .data-table thead th {
+                padding: 8px 10px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-input {
+                min-width: 100%;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .modal-buttons {
+                flex-direction: column;
+            }
+            .modal-btn.submit {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Модальное окно для добавления кандидата -->
+    <div id="addCandidateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добавить кандидата</h2>
+                <button class="modal-close" onclick="closeAddModal()">&times;</button>
+            </div>
+            <div id="modal-message"></div>
+            <form id="add-candidate-form" onsubmit="submitAddCandidate(event)">
+                <div class="form-group">
+                    <label for="fio">ФИО кандидата *</label>
+                    <input type="text" id="fio" name="FCs_candidate" placeholder="Иванов Иван Иванович" required>
+                    <div class="hint"> Введите полное имя, отчество и фамилию кандидата</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="documents">Номер паспорта *</label>
+                    <input type="text" id="documents" name="documents_candidate" placeholder="1234567890" required>
+                    <div class="hint"> Введите номер паспорта (серия и номер без пробелов)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Дата рождения *</label>
+                    <input type="date" id="date" name="date_candidate" required>
+                    <div class="hint"> Выберите дату рождения кандидата</div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn cancel" onclick="closeAddModal()">Отмена</button>
+                    <button type="submit" class="modal-btn submit">Добавить кандидата</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">ГИБДД</div>
+        <nav class="nav-buttons">
+         <a href="{{ url_for('routes.home') }}" class="btn">Главная</a>
+         {% if session.get('role') %}
+            <a href="{{ url_for('routes.logout') }}" class="btn logout-btn">Выход</a>
+         {% else %}
+            <a href="{{ url_for('routes.login') }}" class="btn">Вход в систему</a>
+         {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% if session.get('role') == 'driving_school_employee' %}
+            <div class="content-block">
+                <div class="user-info">
+                    <h2>Добро пожаловать, {{ session.get('username') }}!</h2>
+                    <p>Вы успешно авторизовались как сотрудник автошколы.</p>
+                </div>
+
+                <h3>Управление кандидатами и заявками</h3>
+                <p>Выберите одно из действий для управления данными в системе.</p>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="loadCandidates()">Список кандидатов</button>
+                    <button class="action-btn" onclick="loadStatements()">Заявления</button>
+                    <button class="action-btn" onclick="loadExams()">Статус экзамена</button>
+                </div>
+
+                <div id="candidates-section" class="data-section">
+                    <div class="nested-buttons" style="margin: 0; padding: 0; background: none; border: none; display: block;">
+                        <h4 style="color: #0052cc; margin-bottom: 15px;">Операции со списком кандидатов:</h4>
+                        <button class="nested-btn" onclick="openAddModal()">Добавить кандидата</button>
+                    </div>
+                    <div class="search-container" style="margin-top: 15px;">
+                        <input type="text" id="candidates-search" class="search-input" placeholder="Поиск по ID или ФИО кандидата">
+                        <button class="search-btn" onclick="filterCandidatesTable()">Найти</button>
+                    </div>
+                    <div id="candidates-table"></div>
+                </div>
+
+                <div id="statements-section" class="data-section">
+                    <h4 style="color: #0052cc; margin-bottom: 15px;">Список заявлений</h4>
+                    <div class="search-container">
+                        <input type="text" id="statements-search" class="search-input" placeholder="Поиск по ID кандидата или ID заявления">
+                        <button class="search-btn" onclick="filterStatementsTable()">Найти</button>
+                    </div>
+                    <div id="statements-table"></div>
+                </div>
+
+                <div id="exams-section" class="data-section">
+                    <h4 style="color: #0052cc; margin-bottom: 15px;">Статус экзаменов</h4>
+                    <div class="search-container">
+                        <input type="text" id="exams-search" class="search-input" placeholder="Поиск по ID заявления">
+                        <button class="search-btn" onclick="filterExamsTable()">Найти</button>
+                    </div>
+                    <div id="exams-table"></div>
+                </div>
+            </div>
+        {% else %}
+            <div class="content-block">
+                <h2>Для автошколы</h2>
+                <p>
+                    Для продолжения работы в системе 
+                        необходимо нажать на кнопку "Вход в систему".
+                </p>
+            </div>
+        {% endif %}
+
+    <footer>
+        {% if session.get('role') %}
+            <div style="margin-bottom: 10px; font-size: 0.95rem; color: #000000;">
+                Авторизован как: <strong>{{ session.get('username') }}</strong>
+            </div>
+        {% endif %}
+        2026 by Artemy Maximov
+    </footer>
+
+    <script>
+        const columnNames = {
+            'candidate_to_driver_id': 'ID кандидата',
+            'FCs_candidate': 'ФИО кандидата',
+            'date_candidate': 'Дата рождения',
+            'statement_id': 'ID заявления',
+            'status_exam': 'Статус экзамена',
+            'documents_candidate': 'Паспорт кандидата',
+            'date_of_submission': 'Дата сдачи',
+            'license_class': 'Категория прав',
+            'personal_dps_id': 'ID сотрудника ГИБДД'
+        };
+
+        function translateColumnName(columnName) {
+            return columnNames[columnName] || columnName.replace(/_/g, ' ').charAt(0).toUpperCase() + columnName.slice(1);
+        }
+
+        function renderTable(data, elementId) {
+            const element = document.getElementById(elementId);
+
+            if (!data || data.length === 0) {
+                element.innerHTML = '<div class="no-data">Нет данных для отображения</div>';
+                return;
+            }
+
+            const columns = Object.keys(data[0]);
+            let html = '<table class="data-table"><thead><tr>';
+
+            columns.forEach(col => {
+                html += `<th>${translateColumnName(col)}</th>`;
+            });
+
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let raw = row[col];
+                    let value = '-';
+
+                    if (raw !== null && raw !== undefined) {
+                        // Специальная обработка для статуса экзамена
+                        if (col === 'status_exam') {
+                            // Поддерживаем булевы и строковые представления
+                            if (raw === true) {
+                                value = 'Сдал';
+                            } else {
+                                value = 'Не сдал';
+                            }
+                        } else {
+                            value = raw;
+                        }
+                    }
+
+                    html += `<td>${value}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            element.innerHTML = html;
+        }
+
+        function loadCandidates() {
+            const section = document.getElementById('candidates-section');
+            const tableDiv = document.getElementById('candidates-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            section.classList.add('show');
+            
+            fetch('/api/candidates')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        renderTable(data.data, 'candidates-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        }
+
+        function loadStatements() {
+            const section = document.getElementById('statements-section');
+            const tableDiv = document.getElementById('statements-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            document.getElementById('candidates-section').classList.remove('show');
+            document.getElementById('exams-section').classList.remove('show');
+            section.classList.add('show');
+            
+            fetch('/api/statements')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        renderTable(data.data, 'statements-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        }
+
+        function loadExams() {
+            const section = document.getElementById('exams-section');
+            const tableDiv = document.getElementById('exams-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            document.getElementById('candidates-section').classList.remove('show');
+            document.getElementById('statements-section').classList.remove('show');
+            section.classList.add('show');
+            
+            fetch('/api/exams')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        renderTable(data.data, 'exams-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        }
+
+        // Переменные для хранения исходных данных
+        let candidatesData = [];
+        let statementsData = [];
+        let examsData = [];
+
+        // Сохраняем исходные данные при загрузке
+        const originalLoadCandidates = loadCandidates;
+        loadCandidates = function() {
+            const section = document.getElementById('candidates-section');
+            const tableDiv = document.getElementById('candidates-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            section.classList.add('show');
+            
+            fetch('/api/candidates')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        candidatesData = data.data;
+                        renderTable(candidatesData, 'candidates-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        };
+
+        const originalLoadStatements = loadStatements;
+        loadStatements = function() {
+            const section = document.getElementById('statements-section');
+            const tableDiv = document.getElementById('statements-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            document.getElementById('candidates-section').classList.remove('show');
+            document.getElementById('exams-section').classList.remove('show');
+            section.classList.add('show');
+            
+            fetch('/api/statements')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        statementsData = data.data;
+                        renderTable(statementsData, 'statements-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        };
+
+        const originalLoadExams = loadExams;
+        loadExams = function() {
+            const section = document.getElementById('exams-section');
+            const tableDiv = document.getElementById('exams-table');
+            
+            tableDiv.innerHTML = '<div class="loading">Загрузка данных...</div>';
+            document.getElementById('candidates-section').classList.remove('show');
+            document.getElementById('statements-section').classList.remove('show');
+            section.classList.add('show');
+            
+            fetch('/api/exams')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        tableDiv.innerHTML = `<div class="error">Ошибка: ${data.error}</div>`;
+                    } else {
+                        examsData = data.data;
+                        renderTable(examsData, 'exams-table');
+                    }
+                })
+                .catch(error => {
+                    tableDiv.innerHTML = `<div class="error">Ошибка подключения: ${error.message}</div>`;
+                });
+        };
+
+        // Функции фильтрации таблиц
+        function filterCandidatesTable() {
+            const searchValue = document.getElementById('candidates-search').value.toLowerCase().trim();
+            
+            if (!searchValue) {
+                renderTable(candidatesData, 'candidates-table');
+                return;
+            }
+
+            const filtered = candidatesData.filter(row => {
+                const id = row['candidate_to_driver_id'] ? String(row['candidate_to_driver_id']).toLowerCase() : '';
+                const fio = row['FCs_candidate'] ? String(row['FCs_candidate']).toLowerCase() : '';
+                
+                return id.includes(searchValue) || fio.includes(searchValue);
+            });
+
+            renderTable(filtered, 'candidates-table');
+        }
+
+        function filterStatementsTable() {
+            const searchValue = document.getElementById('statements-search').value.toLowerCase().trim();
+            
+            if (!searchValue) {
+                renderTable(statementsData, 'statements-table');
+                return;
+            }
+
+            const filtered = statementsData.filter(row => {
+                const candidateId = row['candidate_to_driver_id'] ? String(row['candidate_to_driver_id']).toLowerCase() : '';
+                const statementId = row['statement_id'] ? String(row['statement_id']).toLowerCase() : '';
+                
+                return candidateId.includes(searchValue) || statementId.includes(searchValue);
+            });
+
+            renderTable(filtered, 'statements-table');
+        }
+
+        function filterExamsTable() {
+            const searchValue = document.getElementById('exams-search').value.toLowerCase().trim();
+            
+            if (!searchValue) {
+                renderTable(examsData, 'exams-table');
+                return;
+            }
+
+            const filtered = examsData.filter(row => {
+                const statementId = row['statement_id'] ? String(row['statement_id']).toLowerCase() : '';
+                
+                return statementId.includes(searchValue);
+            });
+
+            renderTable(filtered, 'exams-table');
+        }
+
+        // Управление модальным окном добавления кандидата
+        function openAddModal() {
+            const modal = document.getElementById('addCandidateModal');
+            modal.classList.add('show');
+            document.getElementById('fio').focus();
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('addCandidateModal');
+            modal.classList.remove('show');
+            document.getElementById('add-candidate-form').reset();
+            document.getElementById('modal-message').textContent = '';
+        }
+
+        function submitAddCandidate(event) {
+            event.preventDefault();
+
+            const fio = document.getElementById('fio').value.trim();
+            const documents = document.getElementById('documents').value.trim();
+            const dateStr = document.getElementById('date').value.trim();
+
+            // Простая валидация
+            if (!fio || !documents || !dateStr) {
+                document.getElementById('modal-message').textContent = 'Ошибка: заполните все поля';
+                document.getElementById('modal-message').style.color = '#cc0000';
+                return;
+            }
+
+            // Отправляем данные на сервер
+            fetch('/api/add-candidate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    FCs_candidate: fio,
+                    documents_candidate: documents,
+                    date_candidate: dateStr
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Ошибка при добавлении кандидата');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Успешно добавлено
+                document.getElementById('modal-message').textContent = 'Кандидат успешно добавлен!';
+                document.getElementById('modal-message').style.color = '#00aa00';
+                
+                // Закрываем модальное окно через 1 секунду
+                setTimeout(() => {
+                    closeAddModal();
+                    // Перезагружаем таблицу кандидатов
+                    loadCandidates();
+                }, 1000);
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('modal-message').textContent = 'Ошибка: ' + error.message;
+                document.getElementById('modal-message').style.color = '#cc0000';
+            });
+        }
+
+        // Закрытие модала по клику на темный фон
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('addCandidateModal');
+            if (event.target === modal) {
+                closeAddModal();
+            }
+        });
+
+        // Добавляем поддержку Enter в поисковых полях
+        document.addEventListener('DOMContentLoaded', function() {
+            const candidatesSearch = document.getElementById('candidates-search');
+            const statementsSearch = document.getElementById('statements-search');
+            const examsSearch = document.getElementById('exams-search');
+
+            if (candidatesSearch) {
+                candidatesSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') filterCandidatesTable();
+                });
+            }
+
+            if (statementsSearch) {
+                statementsSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') filterStatementsTable();
+                });
+            }
+
+            if (examsSearch) {
+                examsSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') filterExamsTable();
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
